@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style media="screen">
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: black;
+        font-family: Helvetica, Arial, sans-serif;
+        color: white;
+        padding: 20px;
+      }
+      b.divider {
+        display: block;
+        position: relative;
+        height: 30vh;
+        min-height: 40px;
+      }
+      input {
+        width: auto;
+        height: 50px;
+        padding: 30px;
+        box-sizing: border-box;
+        font-size: 22px;
+        font-weight: bold;
+        background: black;
+        border: none;
+        color: white;
+        outline: none;
+      }
+      #pronom {
+        display: inline-block;
+        margin: 30px;
+        margin-right: 0;
+        font-size: 22px;
+      }
+      div.options {
+        position: absolute;
+        right: 0;
+        top: 0;
+        text-align: right;
+        padding-right: 10px;
+      }
+      label {
+        display: block;
+        padding-left: 15px;
+        text-indent: -15px;
+      }
+
+      label input {
+        width: 15px;
+        height: 15px;
+        padding: 0;
+        margin: 0;
+        vertical-align: bottom;
+        position: relative;
+        top: -1px;
+      }
+      button {
+        background: black;
+        color: #bbb;
+        font-size: 19px;
+        text-decoration: underline;
+        border: none;
+        padding: 12px 30px;
+        outline: none;
+      }
+      button:hover {
+        color: #fff;
+        transform: scale(1.1);
+      }
+      button:active {
+        background: white;
+        color: #000;
+        font-weight: 700;
+      }
+      div#vrai, div#faux {
+        width: 400px;
+        height: 100px;
+        background: rgba(0,60,0,0.4);
+        position: absolute;
+        color: green;
+        align-items: center;
+        justify-content: center;
+        font-size: 64px;
+        display: flex;
+        border: 10px solid green;
+        left: calc(50vw - 200px);
+        top: 150px;
+        opacity: 0;
+        transition: 200ms;
+        font-weight: 700;
+      }
+      div#faux {
+        border-color: darkred;
+        color: darkred;
+        background: rgba(60,0,0,0.4);
+      }
+      div#timer {
+        position:absolute;
+        bottom: 20px;
+        right: 20px;
+        font-size: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id=timer></div>
+    <div id="vrai">vrai!</div>
+    <div id="faux">faux!</div>
+    <div class="options">
+      <form>
+        <label><u>bientôt disponible</u></label>
+        <label><input type=checkbox disabled readonly> L'audio</input></label>
+        <label><input type=checkbox disabled readonly checked> ER Verbes</input></label>
+        <label><input type=checkbox disabled readonly checked> IR Verbes</input></label>
+        <label><input type=checkbox disabled readonly checked> RE Verbes</input></label>
+        <label><input type=checkbox disabled readonly checked> Les verbes irréguliers (facile)</input></label>
+        <label><input type=checkbox disabled readonly checked> Les verbes irréguliers (difficile)</input></label>
+      </form>
+    </div>
+    <h1>French Verb Conjugation (beta)</h1><p style=color:grey>(don't use accents)</p>
+    <b class="divider"></b>
+    <h2 style=margin-left:160px; id=verbe>verbe</h2>
+    <div id="pronom">pronom</div><input autocomplete=off id=input placeholder="verbe conjugué"></input>
+    <b class="divider"></b>
+    <button onclick="start()">commencez</button>
+    <script type="text/javascript">
+    var verbes = {};
+    let close = {};
+    var num = 0;
+    var pronomMain = {};
+    var timer = {};
+    var timerLoop = {};
+    var score = 0;
+    const input = document.getElementById("input");
+    const pronoms = [
+      "je",
+      "tu",
+      "il",
+      "elle",
+      "on",
+      "nous",
+      "vous",
+      "ils",
+      "elles"
+    ];
+    const pronomsConj = [
+      "je", //0
+      "tu", //1
+      "il", //2
+      "nous", //3
+      "vous", //4
+      "ils" //5
+    ];
+    const correctaimer = [
+      "aime",
+      "aimes",
+      "aime",
+      "aimons",
+      "aimez",
+      "aiment"
+    ];
+    const correctêtre = [
+      "suis",
+      "es",
+      "est",
+      "sommes",
+      "etes",
+      "sont"
+    ];
+    const correctchanter = [
+      "chante",
+      "chantes",
+      "chante",
+      "chantons",
+      "chantez",
+      "chantent"
+    ];
+    const correctnager = [
+      "nage",
+      "nages",
+      "nage",
+      "nageons",
+      "nagez",
+      "nagent"
+    ];
+    const correctfaire = [
+      "fais",
+      "fais",
+      "fait",
+      "faisons",
+      "faites",
+      "font"
+    ];
+    const correctavoir = [
+      "ai",
+      "as",
+      "a",
+      "avons",
+      "avez",
+      "ont"
+    ];
+    const correctfinir = [
+      "finis",
+      "finis",
+      "finit",
+      "finissons",
+      "finissez",
+      "finissent"
+    ];
+    const correctprendre = [
+      "prends",
+      "prends",
+      "prend",
+      "prenons",
+      "prenez",
+      "prennent"
+    ];
+    const correctboire = [
+      "bois",
+      "bois",
+      "boit",
+      "buvons",
+      "buvez",
+      "boivent"
+    ];
+    const correctchoisir = [
+      "choisis",
+      "choisis",
+      "choisit",
+      "choisissons",
+      "choisissez",
+      "choisissent"
+    ];
+    const correctétudier = [
+      "etudie",
+      "etudies",
+      "etudie",
+      "etudions",
+      "etudiez",
+      "etudient"
+    ];
+    verbesOriginal = [
+      "aimer",
+      "être",
+      "chanter",
+      "nager",
+      "faire",
+      "avoir",
+      "finir",
+      "prendre",
+      "boire",
+      "choisir",
+      "étudier",
+    ];
+      function start() {
+        verbes = [
+          "aimer",
+          "être",
+          "chanter",
+          "nager",
+          "faire",
+          "avoir",
+          "finir",
+          "prendre",
+          "boire",
+          "choisir",
+          "étudier",
+        ];
+        for (i=0;i<verbes.length;i++) {
+          num = 0;
+          var tmp, current, top = verbes.length;
+          if(top) while(--top) {
+            current = Math.floor(Math.random() * (top + 1));
+            tmp = verbes[current];
+            verbes[current] = verbes[top];
+            verbes[top] = tmp;
+          }}
+        next();
+        input.focus();
+        input.select();
+        beginTimer();
+      }
+      function next() {
+        check(input.value, verbes[num - 1], pronomMain);
+          document.getElementById("verbe").innerHTML = verbes[num];
+          if (num+1>verbes.length) {
+            stopTimer();
+            alert("votre note est "+score+"/11")
+            num = 0;
+            score = 0;
+          }
+          input.value = null;
+          input.focus();
+          input.select();
+          num++;
+          pronomMain = pronoms[Math.floor(Math.random() * pronoms.length)];
+          document.getElementById("pronom").innerHTML = pronomMain;
+      }
+      function check(val, verbe, pronom) {
+        if(verbe == null) {} else {
+          let pronomN = pronom
+          if (pronom == "elle") {
+            pronomN = "il";
+          } else if (pronom == "on") {
+            pronomN = "il";
+          } else if (pronom == "elles") {
+            pronomN = "ils";
+          }
+          let pronomNum = pronomsConj.indexOf(pronomN);
+          let array = eval("correct"+verbe);
+          let correctAnswer = array[pronomNum];
+          console.log("correct answer "+correctAnswer);
+          if (val == correctAnswer) {
+            document.getElementById("vrai").style.opacity = 1;
+            score++
+            close = setTimeout(closevrai, 600);
+          } else {
+            document.getElementById("faux").style.opacity = 1;
+            close = setTimeout(closefaux, 600);
+          }
+        }
+      }
+      function closevrai() { document.getElementById("vrai").style.opacity = 0 }
+      function closefaux() { document.getElementById("faux").style.opacity = 0 }
+      input.onkeyup = function(e) {
+        if (e.keyCode == 13) {
+          next();
+        }
+      }
+      function beginTimer() {
+        timer = 0;
+        timerLoop = setInterval(addTimer, 10);
+      }
+      function addTimer() {
+        timer++;
+        if (timer.toString().length < 3) {
+          timerDisplay = "0,"+timer;
+        } else if (timer.toString().length == 3) {
+          timerDisplay = timer.toString().slice(0,1)+","+timer.toString().slice(1,3);
+        } else if (timer.toString().length == 4) {
+          timerDisplay = timer.toString().slice(0,2)+","+timer.toString().slice(2,4);
+        } else if (timer.toString().length == 5) {
+          timerDisplay = timer.toString().slice(0,3)+","+timer.toString().slice(3,5);
+        } else {
+          timerDisplay = "number too large lol --";
+        }
+        document.getElementById("timer").innerHTML = timerDisplay+" seconds";
+      }
+      function stopTimer() {
+        clearInterval(timerLoop);
+      }
+    </script>
+  </body>
+  <!--
+  const correct = [
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ];
+-->
+</html>
