@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>les verbes français</title>
     <style media="screen">
       * {
         margin: 0;
@@ -37,6 +37,7 @@
         margin: 30px;
         margin-right: 0;
         font-size: 22px;
+        color: #bbb;
       }
       div.options {
         position: absolute;
@@ -106,12 +107,45 @@
         right: 20px;
         font-size: 40px;
       }
+      div#attempts {
+        position: absolute;
+        height: 50vh;
+        top: 25vh;
+        right: 2px;
+        width: 250px;
+        background: black;
+        border: 2px solid white;
+      }
+      table {overflow:scroll}
+      table, tr {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        box-shadow: inset 1px 1px 0px white,
+                    inset -1px -1px 0px white;
+        padding: 4px 0px;
+        text-align: center;
+      }
+      th {
+        box-shadow: inset 2px 2px 0px white,
+                    inset -2px -2px 0px white;
+      }
     </style>
   </head>
   <body>
     <div id=timer></div>
     <div id="vrai">vrai!</div>
     <div id="faux">faux!</div>
+    <div id="attempts">
+      <table id=tableau>
+        <tr>
+          <th style=width:40%;>date</th>
+          <th style=width:40%;>time</th>
+          <th style=width:20%;>score</th>
+        </tr>
+      </table>
+    </div>
     <div class="options">
       <form>
         <label><u>bientôt disponible</u></label>
@@ -135,8 +169,14 @@
     var num = 0;
     var pronomMain = {};
     var timer = {};
+    var timerDisplay = {};
     var timerLoop = {};
     var score = 0;
+    let savedTable = window.localStorage.getItem("savedTable");
+    console.log(window.localStorage.getItem("savedTable"));
+    if (savedTable.toString() == "null") { window.localStorage.setItem("savedTable", "") } else {
+      document.getElementById("tableau").innerHTML+=savedTable;
+    }
     const input = document.getElementById("input");
     const pronoms = [
       "je",
@@ -245,7 +285,7 @@
       "etudiez",
       "etudient"
     ];
-    verbesOriginal = [
+    const verbesOriginal = [
       "aimer",
       "être",
       "chanter",
@@ -291,7 +331,7 @@
           document.getElementById("verbe").innerHTML = verbes[num];
           if (num+1>verbes.length) {
             stopTimer();
-            alert("votre note est "+score+"/11")
+            chartScore();
             num = 0;
             score = 0;
           }
@@ -350,12 +390,41 @@
         } else {
           timerDisplay = "number too large lol --";
         }
-        document.getElementById("timer").innerHTML = timerDisplay+" seconds";
+        document.getElementById("timer").innerHTML = timerDisplay+" secondes";
       }
       function stopTimer() {
         clearInterval(timerLoop);
+        document.getElementById("timer").innerHTML = timerDisplay+" secondes"
+      }
+      function chartScore() {
+        const d = new Date();
+        const year = d.getFullYear().toString().slice(2,4);
+        const month = d.getMonth()+1;
+        const day = d.getDate();
+        let hours = d.getHours();
+        let tableau = document.getElementById("tableau")
+        const tr = tableau.insertRow();
+        var td = tr.insertCell();
+        let date = day+"-"+month+"-"+year;
+        console.log(date);
+        td.appendChild(document.createTextNode(date));
+        var td = tr.insertCell();
+        td.appendChild(document.createTextNode(timerDisplay));
+        var td = tr.insertCell();
+        td.appendChild(document.createTextNode(score+"/11"));
+        savedTable = window.localStorage.getItem("savedTable");
+        savedTable = savedTable+"<tr><td>"+date+"</td><td>"+timerDisplay+"</td><td>"+score+"/11</td></tr>";
+        console.log(savedTable);
+        window.localStorage.setItem("savedTable", savedTable);
+      }
+      </script>
+      <script>
+      function resetLocalStorage() {
+        window.localStorage.setItem("savedTable", null);
       }
     </script>
+    <!--<button onclick=chartScore()>chartScore()</button>-->
+    <!--<button onclick=resetLocalStorage()>resetLocalStorage()</button>-->
   </body>
   <!--
   const correct = [
