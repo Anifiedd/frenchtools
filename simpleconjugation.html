@@ -151,6 +151,9 @@
         transform: scale(1);
         font-weight: 400;
       }
+      button.visible {
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -451,7 +454,7 @@
     </script>
     <br><br><br>
     <button onclick=chartScore() class=defaultButton>chartScore()</button>
-    <button onclick=resetLocalStorage() class=defaultButton>resetLocalStorage()</button>
+    <button onclick=resetLocalStorage() class="defaultButton visible">resetLocalStorage()</button>
   </body>
   <!--
   const correct = [
