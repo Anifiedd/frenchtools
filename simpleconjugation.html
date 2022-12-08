@@ -131,6 +131,26 @@
         box-shadow: inset 2px 2px 0px white,
                     inset -2px -2px 0px white;
       }
+      button.defaultButton {
+        padding: 3px 8px;
+        background: lightgrey;
+        color: black;
+        font-size: 12px;
+        border-radius: 2px;
+        border: 1px solid #999;
+        opacity: 0.1;
+        display: none;
+      }
+      button.defaultButton:hover {
+        border: 1px solid #777;
+        transform: scale(1);
+        opacity: 0.5;
+      }
+      button.defaultButton:active {
+        border: 1px solid #aaa;
+        transform: scale(1);
+        font-weight: 400;
+      }
     </style>
   </head>
   <body>
@@ -142,7 +162,7 @@
         <tr>
           <th style=width:40%;>date</th>
           <th style=width:40%;>temps</th>
-          <th style=width:20%;>note</th>
+          <th style=width:20%;>notes</th>
         </tr>
       </table>
     </div>
@@ -155,6 +175,7 @@
         <label><input type=checkbox disabled readonly checked> RE Verbes</input></label>
         <label><input type=checkbox disabled readonly checked> Les verbes irréguliers (facile)</input></label>
         <label><input type=checkbox disabled readonly checked> Les verbes irréguliers (difficile)</input></label>
+        <label><input type=checkbox onchange=debug() disabled readonly> débogage</input></label>
       </form>
     </div>
     <h1>French Verb Conjugation (beta)</h1><p style=color:grey>(don't use accents)</p>
@@ -165,7 +186,7 @@
     <button onclick="start()">commencez</button>
     <script type="text/javascript">
     var verbes = {};
-    let close = {};
+    let closePopup = {};
     var num = 0;
     var pronomMain = {};
     var timer = {};
@@ -174,7 +195,10 @@
     var score = 0;
     let savedTable = window.localStorage.getItem("savedTable");
     console.log(window.localStorage.getItem("savedTable"));
-    if (savedTable.toString() == "null") { window.localStorage.setItem("savedTable", "") } else {
+    if (savedTable.toString() == "null") {
+      window.localStorage.setItem("savedTable", "");
+    }
+    else {
       document.getElementById("tableau").innerHTML+=savedTable;
     }
     const input = document.getElementById("input");
@@ -359,15 +383,15 @@
           if (val == correctAnswer) {
             document.getElementById("vrai").style.opacity = 1;
             score++
-            close = setTimeout(closevrai, 600);
+            closePopup = setTimeout(closevrai, 600);
           } else {
             document.getElementById("faux").style.opacity = 1;
-            close = setTimeout(closefaux, 600);
+            closePopup = setTimeout(closefaux, 600);
           }
         }
       }
-      function closevrai() { document.getElementById("vrai").style.opacity = 0 }
-      function closefaux() { document.getElementById("faux").style.opacity = 0 }
+      function closevrai() { document.getElementById("vrai").style.opacity = 0; }
+      function closefaux() { document.getElementById("faux").style.opacity = 0; }
       input.onkeyup = function(e) {
         if (e.keyCode == 13) {
           next();
@@ -394,7 +418,7 @@
       }
       function stopTimer() {
         clearInterval(timerLoop);
-        document.getElementById("timer").innerHTML = timerDisplay+" secondes"
+        document.getElementById("timer").innerHTML = timerDisplay+" secondes";
       }
       function chartScore() {
         const d = new Date();
@@ -404,27 +428,30 @@
         let hours = d.getHours();
         let tableau = document.getElementById("tableau")
         const tr = tableau.insertRow();
-        var td = tr.insertCell();
+        let td = tr.insertCell();
         let date = day+"-"+month+"-"+year;
         console.log(date);
         td.appendChild(document.createTextNode(date));
-        var td = tr.insertCell();
+        td = tr.insertCell();
         td.appendChild(document.createTextNode(timerDisplay));
-        var td = tr.insertCell();
+        td = tr.insertCell();
         td.appendChild(document.createTextNode(score+"/11"));
         savedTable = window.localStorage.getItem("savedTable");
         savedTable = savedTable+"<tr><td>"+date+"</td><td>"+timerDisplay+"</td><td>"+score+"/11</td></tr>";
         console.log(savedTable);
         window.localStorage.setItem("savedTable", savedTable);
       }
-      </script>
-      <script>
       function resetLocalStorage() {
-        window.localStorage.setItem("savedTable", null);
+        window.localStorage.setItem("savedTable", "");
       }
+      /*function debug() {
+        let debugButtons = document.getElementsByClassName("defaultButton");
+        for (i <= )
+      }*/
     </script>
-    <!--<button onclick=chartScore()>chartScore()</button>-->
-    <!--<button onclick=resetLocalStorage()>resetLocalStorage()</button>-->
+    <br><br><br>
+    <button onclick=chartScore() class=defaultButton>chartScore()</button>
+    <button onclick=resetLocalStorage() class=defaultButton>resetLocalStorage()</button>
   </body>
   <!--
   const correct = [
