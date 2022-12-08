@@ -197,6 +197,8 @@
     var timerLoop = {};
     var score = 0;
     let savedTable = window.localStorage.getItem("savedTable");
+    const input = document.getElementById("input");
+
     console.log(window.localStorage.getItem("savedTable"));
     if (savedTable.toString() == "null") {
       window.localStorage.setItem("savedTable", "");
@@ -204,7 +206,6 @@
     else {
       document.getElementById("tableau").innerHTML+=savedTable;
     }
-    const input = document.getElementById("input");
     const pronoms = [
       "je",
       "tu",
